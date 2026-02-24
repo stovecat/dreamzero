@@ -676,6 +676,9 @@ class GrootSimPolicy(BaseGrootSimPolicy):
 
         # 3. Model inference
         with torch.inference_mode():
+            if latent_video is not None and latent_video.shape[2] == 1:
+                # 1 frame is entered, the model expects 33 frames, so duplicate it
+                latent_video = latent_video.repeat(1, 1, 33, 1, 1)
             # with maybe_autocast:
             model_pred = self.trained_model.lazy_joint_video_action_causal(normalized_input, latent_video=latent_video)
         normalized_action = model_pred["action_pred"].float()
